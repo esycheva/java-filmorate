@@ -36,7 +36,7 @@ public class FilmController {
 	@PostMapping
 	public Film create(@Valid @RequestBody Film film) {
 
-		if(film.validateErrors().size() > 0) {
+		if (film.validateErrors().size() > 0) {
 			String str = film.validateErrors()
 				.stream()
 				.collect(Collectors.joining(","));
