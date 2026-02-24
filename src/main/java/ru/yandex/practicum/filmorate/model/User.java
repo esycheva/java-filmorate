@@ -17,7 +17,7 @@ public class User {
 	private String name;
 	private LocalDate birthday;
 
-	public List<String> validateErrors(){
+	public List<String> validateErrors() {
 		List<String> errors = new ArrayList<>();
 
 		if (email == null || email.isBlank() || email.isEmpty()) {
@@ -44,7 +44,7 @@ public class User {
 	}
 
 	public String getName() {
-		if(name == null || name.isEmpty() || name.isBlank()) {
+		if (name == null || name.isEmpty() || name.isBlank()) {
 			return login;
 		}
 		return name;
