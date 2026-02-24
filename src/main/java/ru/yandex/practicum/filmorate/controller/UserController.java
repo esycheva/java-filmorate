@@ -25,17 +25,17 @@ import jakarta.validation.Valid;
 @RestController
 public class UserController {
 	private final Map<Long, User> users = new HashMap<>();
-	private final static Logger log = LoggerFactory.getLogger(UserController.class);
+	private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
 	@GetMapping
-	public Collection<User> findAllFilms (){
+	public Collection<User> findAllFilms() {
 		return users.values();
 	}
 
 	@PostMapping
 	public User create(@Valid @RequestBody User user) {
 
-		if(user.validateErrors().size() > 0) {
+		if (user.validateErrors().size() > 0) {
 			String str = user.validateErrors()
 				.stream()
 				.collect(Collectors.joining(","));
@@ -65,7 +65,7 @@ public class UserController {
 		if (users.containsKey(newUser.getId())) {
 			User oldUser = users.get(newUser.getId());
 
-			if(newUser.validateErrors().size() > 0) {
+			if (newUser.validateErrors().size() > 0) {
 				String str = newUser.validateErrors()
 					.stream()
 					.collect(Collectors.joining(","));
@@ -81,7 +81,7 @@ public class UserController {
 
 			log.info("Обновлён пользователь с идентификатором {}.", oldUser.getId());
 
-			return oldUser;	
+			return oldUser;
 		}
 
 		throw new NotFoundException(String.format("Пользователь с id=%s не найден.", newUser.getId()));
