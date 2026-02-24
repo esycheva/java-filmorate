@@ -361,5 +361,5 @@ class FilmorateApplicationTests {
 		List<String> result = user.validateErrors();
 
 		assertFalse(result.contains("Дата рождения не может быть в будущем."));
-	}	
+	}
 }
