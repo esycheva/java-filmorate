@@ -26,67 +26,67 @@ import jakarta.validation.Valid;
 public class UserController {
 	private final Map<Long, User> users = new HashMap<>();
 	private final static Logger log = LoggerFactory.getLogger(UserController.class);
-	
+
 	@GetMapping
 	public Collection<User> findAllFilms (){
 		return users.values();
 	}
-	
+
 	@PostMapping
 	public User create(@Valid @RequestBody User user) {
-		
+
 		if(user.validateErrors().size() > 0) {
 			String str = user.validateErrors()
 				.stream()
 				.collect(Collectors.joining(","));
-			
+
 			log.error("Произошла ошибка валадации пользователя c id={}: {}", user.getId(), str);
-			
+
 			throw new RecordNotValidException(str);
 		}
-		
+
 		user.setId(getNextId());
-		
+
 		users.put(user.getId(), user);
-		
+
 		log.info("Создан пользователь с логином {}.", user.getLogin());
-		
+
 		return user;
 	}
-	
+
 	@PutMapping
 	public User update(@Valid @RequestBody User newUser) {
-		
+
 		if (newUser.getId().equals(null)) {
 			log.error("Id должен быть указан.");
 			throw new RecordNotValidException("Id должен быть указан.");
 		}
-		
+
 		if (users.containsKey(newUser.getId())) {
 			User oldUser = users.get(newUser.getId());
-			
+
 			if(newUser.validateErrors().size() > 0) {
 				String str = newUser.validateErrors()
 					.stream()
 					.collect(Collectors.joining(","));
-			
+
 				log.error("Произошла ошибка валадации пользователя c id={}: {}", newUser.getId(), str);
 				throw new RecordNotValidException(str);
 			}
-			
+
 			oldUser.setEmail(newUser.getEmail());
 			oldUser.setLogin(newUser.getLogin());
 			oldUser.setName(newUser.getName());
 			oldUser.setBirthday(newUser.getBirthday());
-			
+
 			log.info("Обновлён пользователь с идентификатором {}.", oldUser.getId());
-			
+
 			return oldUser;	
 		}
-		
+
 		throw new NotFoundException(String.format("Пользователь с id=%s не найден.", newUser.getId()));
 	}
-	
+
 	private Long getNextId() {
 		Long currentMaxId = users.keySet()
 				.stream()
