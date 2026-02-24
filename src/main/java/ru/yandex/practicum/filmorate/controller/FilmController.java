@@ -26,10 +26,10 @@ import jakarta.validation.Valid;
 public class FilmController {
 	private final Map<Long, Film> films = new HashMap<>();
 
-	private final static Logger log = LoggerFactory.getLogger(FilmController.class);
+	private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
 	@GetMapping
-	public Collection<Film> findAllFilms (){
+	public Collection<Film> findAllFilms() {
 		return films.values();
 	}
 
@@ -42,7 +42,7 @@ public class FilmController {
 				.collect(Collectors.joining(","));
 
 			log.error("Произошла ошибка валадации фильма c id={}: {}", film.getId(), str);
-			
+
 			throw new RecordNotValidException(str);
 		}
 
@@ -68,7 +68,7 @@ public class FilmController {
 		if (films.containsKey(newFilm.getId())) {
 			Film oldFilm = films.get(newFilm.getId());
 
-			if(newFilm.validateErrors().size() > 0) {
+			if (newFilm.validateErrors().size() > 0) {
 				String str = newFilm.validateErrors()
 					.stream()
 					.collect(Collectors.joining(","));
@@ -85,12 +85,12 @@ public class FilmController {
 
 			log.info("Обновлён фильм с идентификатором {}.", oldFilm.getId());
 
-			return oldFilm;	
+			return oldFilm;
 		}
 
 		throw new NotFoundException(String.format("Фильм с id=%s не найден.", newFilm.getId()));
 	}
-	
+
 	private Long getNextId() {
 		Long currentMaxId = films.keySet()
 				.stream()
