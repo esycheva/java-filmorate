@@ -12,7 +12,7 @@ public class Film {
 	private String description;
 	private LocalDate releaseDate;
 	private Integer duration;
-	
+
 	public List<String> validateErrors() {
 		List<String> errors = new ArrayList<>();
 
@@ -32,7 +32,7 @@ public class Film {
 
 		if (duration != null && duration < 0) {
 			errors.add("Продолжительность должна быть больше нуля.");
-		}	
+		}
 		return errors;
 	}
 }
