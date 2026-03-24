@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import lombok.Data;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 
 @Data
 public class Film {
@@ -12,6 +13,11 @@ public class Film {
 	private String description;
 	private LocalDate releaseDate;
 	private Integer duration;
+	private Set<Long> likes;
+
+	public Integer likeCount(){
+		return likes.size();
+	}
 
 	public List<String> validateErrors() {
 		List<String> errors = new ArrayList<>();
