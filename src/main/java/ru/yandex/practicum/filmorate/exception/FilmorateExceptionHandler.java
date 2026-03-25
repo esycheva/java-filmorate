@@ -7,25 +7,25 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class FilmorateExceptionHandler {
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleAllExceptions(NotFoundException ex) {
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<String> handleNotFoundExceptions(NotFoundException ex) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body("Произошла ошибка: " + ex.getMessage());
+                .body(String.format("{\"error\": \"%s\"}", ex.getMessage()));
     }
 
     @ExceptionHandler(RecordNotValidException.class)
-    public ResponseEntity<String> handleIllegalArgumentException(RecordNotValidException ex) {
+    public ResponseEntity<String> handleRecordNotValidException(RecordNotValidException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body("{}");
+                .body(String.format("{\"error\": \"%s\"}", ex.getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Ошибка: " + ex.getMessage());
+                .body(String.format("{\"error\": \"%s\"}", ex.getMessage()));
     }
 }
 

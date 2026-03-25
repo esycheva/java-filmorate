@@ -50,14 +50,9 @@ public class UserController {
 
 	@PutMapping
 	public User update(@Valid @RequestBody User newUser) {
-		try{
-			User oldUser = storage.update(newUser);
-			log.info("Обновлён пользователь с идентификатором {}.", oldUser.getId());
-			return oldUser;
-		} catch(RecordNotValidException | NotFoundException e) {
-			log.error(e.getMessage());
-			throw new RuntimeException(e);
-		}
+		User oldUser = storage.update(newUser);
+		log.info("Обновлён пользователь с идентификатором {}.", oldUser.getId());
+		return oldUser;
 	}
 
 	@PutMapping("/{id}/friends/{friendId}")
@@ -65,7 +60,7 @@ public class UserController {
 		Optional<User> optUser = service.addToFriends(id, friendId);
 
 		return optUser.map(user -> ResponseEntity
-				.status(HttpStatus.CREATED)
+				.status(HttpStatus.OK)
 				.body(user)).orElseGet(() -> ResponseEntity
 				.notFound().build());
 	}
@@ -82,7 +77,11 @@ public class UserController {
 
 	@GetMapping("/{id}/friends")
 	public List<User> showFriends(@PathVariable Long id){
-		return service.showFriends(id);
+		List<User> friends = storage.showFriends(id);
+		if (friends.isEmpty()) {
+			throw new NotFoundException("Пользователь не найден.");
+		}
+		return friends;
 	}
 
 	@GetMapping("/{id}/friends/common/{otherId}")
