@@ -43,14 +43,9 @@ public class UserController {
 
 	@PostMapping
 	public User create(@Valid @RequestBody User user) {
-		try {
-			User createdUser = storage.create(user);
-			log.info("Создан пользователь с логином {}.", createdUser.getLogin());
-			return createdUser;
-		} catch (RecordNotValidException e) {
-			log.error("Произошла ошибка валадации пользователя: {}", e.getMessage());
-			throw new RuntimeException(e);
-		}
+		User createdUser = storage.create(user);
+		log.info("Создан пользователь с логином {}.", createdUser.getLogin());
+		return createdUser;
 	}
 
 	@PutMapping

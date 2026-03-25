@@ -21,10 +21,19 @@ public class InMemoryUserStorage implements UserStorage {
 
     public Optional<User> addFriend(Long id, Long friendUserId){
         Optional<User> optUser = find(id);
+        Optional<User> friendUser = find(friendUserId);
+
+        optUser.orElseThrow(() -> new NotFoundException(String.format("Пользователь с id=%s не найден", id)));
+
+        friendUser.orElseThrow(() -> new NotFoundException(String.format("Пользователь с id=%s не найден", friendUserId)));
 
         if (optUser.isPresent()) {
             User user = optUser.get();
             Set<Long> friends = user.getFriends();
+            if (friends == null) {
+                friends = new HashSet<>();
+                user.setFriends(friends);
+            }
             if (!friends.contains(friendUserId)) {
                 friends.add(friendUserId);
             }
@@ -79,7 +88,6 @@ public class InMemoryUserStorage implements UserStorage {
             return List.of();
         }
     }
-
 
     public Collection<User> findAllFilms() {
         return users.values();

@@ -43,30 +43,18 @@ public class FilmController {
 
 	@PostMapping
 	public Film create(@Valid @RequestBody Film film) {
-		try {
-			Film createdFilm = storage.create(film);
-
-			log.info("Создан фильм {}.", createdFilm.getName());
-
-			return createdFilm;
-		} catch(RecordNotValidException e) {
-			log.error("Произошла ошибка валадации фильма: {}", e.getMessage());
-			throw new RuntimeException(e);
-		}
+		Film createdFilm = storage.create(film);
+		log.info("Создан фильм {}.", createdFilm.getName());
+		return createdFilm;
 	}
 
 	@PutMapping
 	public Film update(@Valid @RequestBody Film newFilm) {
-		try {
-			Film oldFilm = storage.update(newFilm);
+		Film oldFilm = storage.update(newFilm);
 
-			log.info("Обновлён фильм с идентификатором {}.", oldFilm.getId());
+		log.info("Обновлён фильм с идентификатором {}.", oldFilm.getId());
 
-			return oldFilm;
-		} catch(RecordNotValidException | NotFoundException e) {
-			log.info(e.getMessage());
-			throw new RuntimeException(e);
-		}
+		return oldFilm;
 	}
 
 	@PutMapping("/{id}/like/{userId}")
