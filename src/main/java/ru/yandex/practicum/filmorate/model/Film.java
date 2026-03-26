@@ -15,7 +15,7 @@ public class Film {
 	private Integer duration;
 	private Set<Long> likes;
 
-	public Integer likeCount(){
+	public Integer likeCount() {
 		return likes.size();
 	}
 
