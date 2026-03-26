@@ -56,7 +56,7 @@ public class InMemoryUserStorage implements UserStorage {
     public List<User> showFriends(Long id) {
         Optional<User> optUser = find(id);
 
-        if (optUser.isPresent()){
+        if (optUser.isPresent()) {
             User user = optUser.get();
             Set<Long> friends = user.getFriends();
             return users.values()
