@@ -100,6 +100,8 @@ public class InMemoryUserStorage implements UserStorage {
 
             throw new RecordNotValidException(str);
         }
+        Set<Long> friends = new HashSet<>();
+        user.setFriends(friends);
         user.setId(getNextId());
         users.put(user.getId(), user);
         return user;
@@ -133,7 +135,10 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public Optional<User> findById(Long userId) {
-        return Optional.ofNullable(users.get(userId));
+        if (!users.containsKey(userId)) {
+            throw new NotFoundException(String.format("Пользователь с id=%s не найден.", userId));
+        }
+        return Optional.of(users.get(userId));
     }
 
     private Long getNextId() {
