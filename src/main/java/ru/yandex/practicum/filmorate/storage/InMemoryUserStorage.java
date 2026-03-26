@@ -47,16 +47,16 @@ public class InMemoryUserStorage implements UserStorage {
     public List<User> showFriends(Long id) {
         Optional<User> optUser = find(id);
 
-        if (optUser.isPresent()) {
-            User user = optUser.get();
-            Set<Long> friends = user.getFriends();
-            return users.values()
-                    .stream()
-                    .filter(u -> friends.contains(u.getId()))
-                    .toList();
-        } else {
-            return List.of();
+        if (optUser.isEmpty()) {
+            throw new NotFoundException(String.format("Пользователь с id=%s не найден", id));
         }
+
+        User user = optUser.get();
+        Set<Long> friends = user.getFriends();
+        return users.values()
+                .stream()
+                .filter(u -> friends.contains(u.getId()))
+                .toList();
     }
 
     public List<User> showCommonFriends(Long id, Long otherUserId) {
