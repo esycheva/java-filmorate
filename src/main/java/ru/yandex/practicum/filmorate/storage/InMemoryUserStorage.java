@@ -126,7 +126,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public Optional<User> findById(Long userId) {
-        return Optional.ofNullable(users.get(userId));
+        return find(userId);
     }
 
     private Long getNextId() {
