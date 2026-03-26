@@ -31,6 +31,7 @@ public class User {
 			friends.add(friendUserId);
 		}
 	}
+
 	public List<String> validateErrors() {
 		List<String> errors = new ArrayList<>();
 
