@@ -9,9 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.RecordNotValidException;
 
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import org.slf4j.Logger;
@@ -56,7 +54,7 @@ public class UserController {
 	}
 
 	@PutMapping("/{id}/friends/{friendId}")
-	public ResponseEntity<User> addFriend(@PathVariable Long id, @PathVariable Long friendId){
+	public ResponseEntity<User> addFriend(@PathVariable Long id, @PathVariable Long friendId) {
 		Optional<User> optUser = service.addToFriends(id, friendId);
 
 		return optUser.map(user -> ResponseEntity
@@ -76,7 +74,7 @@ public class UserController {
 	}
 
 	@GetMapping("/{id}/friends")
-	public List<User> showFriends(@PathVariable Long id){
+	public List<User> showFriends(@PathVariable Long id) {
 		List<User> friends = storage.showFriends(id);
 		if (friends.isEmpty()) {
 			throw new NotFoundException("Пользователь не найден.");
