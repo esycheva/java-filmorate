@@ -49,7 +49,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     public List<Film> findPopularFilms(Integer count) {
-        if(count == null) {
+        if (count == null) {
             count = 10;
         }
 
@@ -110,7 +110,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return ++currentMaxId;
     }
 
-    private Optional<Film> find(Long id){
+    private Optional<Film> find(Long id) {
        return films.values().stream()
                 .filter(film -> film.getId().equals(id))
                 .findFirst();
