@@ -75,11 +75,7 @@ public class UserController {
 
 	@GetMapping("/{id}/friends")
 	public List<User> showFriends(@PathVariable Long id) {
-		List<User> friends = storage.showFriends(id);
-		if (friends.isEmpty()) {
-			throw new NotFoundException("Пользователь не найден.");
-		}
-		return friends;
+		return storage.showFriends(id);
 	}
 
 	@GetMapping("/{id}/friends/common/{otherId}")
