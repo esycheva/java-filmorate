@@ -4,20 +4,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import ru.yandex.practicum.filmorate.exception.RecordNotValidException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.http.HttpHeaders;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import jakarta.validation.Valid;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
@@ -58,7 +54,7 @@ public class FilmController {
 	}
 
 	@PutMapping("/{id}/like/{userId}")
-	public ResponseEntity<Film> addLike(@PathVariable Long id, @PathVariable Long userId){
+	public ResponseEntity<Film> addLike(@PathVariable Long id, @PathVariable Long userId) {
 		Optional<Film> optFilm = service.addLike(id, userId);
 
         return optFilm.map(film -> ResponseEntity
@@ -78,7 +74,7 @@ public class FilmController {
 	}
 
 	@GetMapping("/popular?count={count}")
-	public List<Film> findPopularFilms(@PathVariable Integer count){
+	public List<Film> findPopularFilms(@PathVariable Integer count) {
 		return service.showPopular(count);
 	}
 }
