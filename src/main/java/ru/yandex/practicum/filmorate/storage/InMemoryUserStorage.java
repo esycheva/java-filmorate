@@ -26,17 +26,9 @@ public class InMemoryUserStorage implements UserStorage {
 
         friendUser.orElseThrow(() -> new NotFoundException(String.format("Пользователь с id=%s не найден", friendUserId)));
 
-        if (optUser.isPresent()) {
-            User user = optUser.get();
-            Set<Long> friends = user.getFriends();
-            if (friends == null) {
-                friends = new HashSet<>();
-                user.setFriends(friends);
-            }
-            if (!friends.contains(friendUserId)) {
-                friends.add(friendUserId);
-            }
-        }
+        optUser.get().addFriend(friendUserId);
+        friendUser.get().addFriend(id);
+
         return optUser;
     }
 

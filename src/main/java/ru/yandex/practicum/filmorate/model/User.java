@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -19,6 +20,17 @@ public class User {
 	private LocalDate birthday;
 	private Set<Long> friends;
 
+	public void addFriend(Long friendUserId) {
+		Set<Long> friends = getFriends();
+
+		if (friends == null) {
+			friends = new HashSet<>();
+			setFriends(friends);
+		}
+		if (!friends.contains(friendUserId)) {
+			friends.add(friendUserId);
+		}
+	}
 	public List<String> validateErrors() {
 		List<String> errors = new ArrayList<>();
 
