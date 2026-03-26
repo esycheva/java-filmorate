@@ -28,7 +28,6 @@ public class InMemoryUserStorage implements UserStorage {
 
         optUser.get().addFriend(friendUserId);
         friendUser.get().addFriend(id);
-
         return optUser;
     }
 
