@@ -101,6 +101,8 @@ public class InMemoryUserStorage implements UserStorage {
             throw new RecordNotValidException(str);
         }
         user.setId(getNextId());
+        Set<Long> friends = new HashSet<>();
+        user.setFriends(friends);
         users.put(user.getId(), user);
         return user;
     }
