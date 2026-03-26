@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.RecordNotValidException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -19,7 +18,7 @@ public class InMemoryUserStorage implements UserStorage {
         this.users = new HashMap<>();
     }
 
-    public Optional<User> addFriend(Long id, Long friendUserId){
+    public Optional<User> addFriend(Long id, Long friendUserId) {
         Optional<User> optUser = find(id);
         Optional<User> friendUser = find(friendUserId);
 
@@ -41,7 +40,7 @@ public class InMemoryUserStorage implements UserStorage {
         return optUser;
     }
 
-    public Optional<User> removeFriend(Long id, Long friendUserId){
+    public Optional<User> removeFriend(Long id, Long friendUserId) {
         Optional<User> optUser = find(id);
 
         if (optUser.isPresent()) {
@@ -54,7 +53,7 @@ public class InMemoryUserStorage implements UserStorage {
         return optUser;
     }
 
-    public List<User> showFriends(Long id){
+    public List<User> showFriends(Long id) {
         Optional<User> optUser = find(id);
 
         if (optUser.isPresent()){
@@ -69,7 +68,7 @@ public class InMemoryUserStorage implements UserStorage {
         }
     }
 
-    public List<User> showCommonFriends(Long id, Long otherUserId){
+    public List<User> showCommonFriends(Long id, Long otherUserId) {
         Optional<User> optUser = find(id);
         Optional<User> optOtherUser = find(otherUserId);
 

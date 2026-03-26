@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.RecordNotValidException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,11 +14,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films;
 
     @Autowired
-    public InMemoryFilmStorage(){
+    public InMemoryFilmStorage() {
         this.films = new HashMap<>();
     }
 
-    public Optional<Film> findById(Long filmId){
+    public Optional<Film> findById(Long filmId) {
         return Optional.ofNullable(films.get(filmId));
     }
 
@@ -49,7 +48,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return optFilm;
     }
 
-    public List<Film> findPopularFilms(Integer count){
+    public List<Film> findPopularFilms(Integer count) {
         if(count == null) {
             count = 10;
         }
