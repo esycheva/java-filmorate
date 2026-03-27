@@ -32,6 +32,14 @@ public class User {
 		}
 	}
 
+	public void removeFriend(Long friendUserId) {
+		Set<Long> friends = getFriends();
+
+		if (friends.contains(friendUserId)) {
+			friends.remove(friendUserId);
+		}
+	}
+
 	public List<String> validateErrors() {
 		List<String> errors = new ArrayList<>();
 

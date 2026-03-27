@@ -66,7 +66,7 @@ public class UserController {
 		Optional<User> optUser = service.removeFromFriends(id, friendId);
 
 		return optUser.map(film -> ResponseEntity
-				.status(HttpStatus.CREATED)
+				.status(HttpStatus.OK)
 				.body(film)).orElseGet(() -> ResponseEntity
 				.notFound().build());
 	}
@@ -77,7 +77,7 @@ public class UserController {
 	}
 
 	@GetMapping("/{id}/friends/common/{otherId}")
-	public List<User> findPopularFilms(@PathVariable Long id, Long otherId) {
+	public List<User> findCommonFriends(@PathVariable Long id, @PathVariable  Long otherId) {
 		return service.showCommonFriends(id, otherId);
 	}
 }

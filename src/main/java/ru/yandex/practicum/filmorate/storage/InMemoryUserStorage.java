@@ -33,14 +33,15 @@ public class InMemoryUserStorage implements UserStorage {
 
     public Optional<User> removeFriend(Long id, Long friendUserId) {
         Optional<User> optUser = find(id);
+        Optional<User> friendUser = find(friendUserId);
 
-        if (optUser.isPresent()) {
-            User user = optUser.get();
-            Set<Long> friends = user.getFriends();
-            if (friends.contains(friendUserId)) {
-                friends.remove(friendUserId);
-            }
-        }
+        optUser.orElseThrow(() -> new NotFoundException(String.format("Пользователь с id=%s не найден", id)));
+
+        friendUser.orElseThrow(() -> new NotFoundException(String.format("Пользователь с id=%s не найден", friendUserId)));
+
+        optUser.get().removeFriend(friendUserId);
+        friendUser.get().removeFriend(id);
+
         return optUser;
     }
 
@@ -63,20 +64,23 @@ public class InMemoryUserStorage implements UserStorage {
         Optional<User> optUser = find(id);
         Optional<User> optOtherUser = find(otherUserId);
 
-        if (optUser.isPresent() && optOtherUser.isPresent()) {
-            User user = optUser.get();
-            User otherUser = optOtherUser.get();
+        optUser.orElseThrow(() -> new NotFoundException(String.format("Пользователь с id=%s не найден", id)));
 
-            Set<Long> friends = user.getFriends();
-            Set<Long> otherFriends = otherUser.getFriends();
+        optOtherUser.orElseThrow(() -> new NotFoundException(String.format("Пользователь с id=%s не найден", optOtherUser)));
 
-            return users.values()
-                    .stream()
-                    .filter(u -> friends.contains(u.getId()) && otherFriends.contains(u.getId()))
-                    .toList();
-        } else {
-            return List.of();
-        }
+        User user = optUser.get();
+        User otherUser = optOtherUser.get();
+
+        Set<Long> friends = user.getFriends();
+        Set<Long> otherFriends = otherUser.getFriends();
+
+        // friends are only common
+        friends.retainAll(otherFriends);
+
+        return users.values()
+                .stream()
+                .filter(u -> friends.contains(u.getId()))
+                .toList();
     }
 
     public Collection<User> findAllFilms() {
@@ -96,10 +100,6 @@ public class InMemoryUserStorage implements UserStorage {
         user.setFriends(friends);
         users.put(user.getId(), user);
         return user;
-    }
-
-    public void delete() {
-
     }
 
     public User update(User newUser) {
