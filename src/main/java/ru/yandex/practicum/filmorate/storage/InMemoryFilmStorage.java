@@ -72,7 +72,12 @@ public class InMemoryFilmStorage implements FilmStorage {
                     .collect(Collectors.joining(","));
             throw new RecordNotValidException(str);
         }
+
         film.setId(getNextId());
+
+        Set<Long> likes = new HashSet<>();
+        film.setLikes(likes);
+
         films.put(film.getId(), film);
         return film;
     }
