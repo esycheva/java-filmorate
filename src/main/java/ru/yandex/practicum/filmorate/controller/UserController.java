@@ -14,10 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.validation.Valid;
-import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 @RestController
 @RequestMapping("/users")
@@ -25,7 +22,7 @@ public class UserController {
 	private final UserService service;
 
 	private static final Logger log = LoggerFactory.getLogger(UserController.class);
-	
+
 	public UserController(UserService service) {
 		this.service = service;
 	}

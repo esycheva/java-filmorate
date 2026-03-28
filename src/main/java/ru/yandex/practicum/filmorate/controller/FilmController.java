@@ -15,8 +15,6 @@ import java.util.Optional;
 
 import jakarta.validation.Valid;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 @RestController
 @RequestMapping("/films")
