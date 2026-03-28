@@ -76,7 +76,7 @@ public class FilmController {
 	@DeleteMapping("/{id}/like/{userId}")
 	public ResponseEntity<Film> removerLike(@PathVariable Long id, @PathVariable Long userId) {
 		Optional<User> optUser = userService.find(userId);
-		
+
 		optUser.orElseThrow(() -> new NotFoundException(String.format("Пользователь с id=%s не найден", userId)));
 
 		Optional<Film> optFilm = service.removeLike(id, userId);
