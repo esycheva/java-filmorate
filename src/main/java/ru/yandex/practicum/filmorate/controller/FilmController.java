@@ -21,15 +21,18 @@ import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-	private final FilmStorage storage = new InMemoryFilmStorage();
 
-	private final FilmService service = new FilmService(storage);
+	private final FilmService service;
 
 	private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
+	public FilmController(FilmService service) {
+		this.service = service;
+	}
+
 	@GetMapping
 	public Collection<Film> findAllFilms() {
-		return storage.findAllFilms();
+		return service.findAllFilms();
 	}
 
 	@GetMapping("/{filmId}")
@@ -39,14 +42,14 @@ public class FilmController {
 
 	@PostMapping
 	public Film create(@Valid @RequestBody Film film) {
-		Film createdFilm = storage.create(film);
+		Film createdFilm = service.create(film);
 		log.info("Создан фильм {}.", createdFilm.getName());
 		return createdFilm;
 	}
 
 	@PutMapping
 	public Film update(@Valid @RequestBody Film newFilm) {
-		Film oldFilm = storage.update(newFilm);
+		Film oldFilm = service.update(newFilm);
 
 		log.info("Обновлён фильм с идентификатором {}.", oldFilm.getId());
 
@@ -58,7 +61,7 @@ public class FilmController {
 		Optional<Film> optFilm = service.addLike(id, userId);
 
         return optFilm.map(film -> ResponseEntity
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.OK)
                 .body(film)).orElseGet(() -> ResponseEntity
                 .notFound().build());
     }
@@ -68,13 +71,13 @@ public class FilmController {
 		Optional<Film> optFilm = service.removeLike(id, userId);
 
 		return optFilm.map(film -> ResponseEntity
-				.status(HttpStatus.CREATED)
+				.status(HttpStatus.OK)
 				.body(film)).orElseGet(() -> ResponseEntity
 				.notFound().build());
 	}
 
-	@GetMapping("/popular?count={count}")
-	public List<Film> findPopularFilms(@PathVariable Integer count) {
+	@GetMapping("/popular")
+	public List<Film> findPopularFilms(@RequestParam Integer count) {
 		return service.showPopular(count);
 	}
 }

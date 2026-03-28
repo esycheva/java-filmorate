@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.validation.Valid;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -21,15 +22,17 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-	private final UserStorage storage = new InMemoryUserStorage();
-
-	private final UserService service = new UserService(storage);
+	private final UserService service;
 
 	private static final Logger log = LoggerFactory.getLogger(UserController.class);
+	
+	public UserController(UserService service) {
+		this.service = service;
+	}
 
 	@GetMapping
-	public Collection<User> findAllFilms() {
-		return storage.findAllFilms();
+	public Collection<User> findAllUsers() {
+		return service.findAllUsers();
 	}
 
 	@GetMapping("/{userId}")
@@ -39,14 +42,14 @@ public class UserController {
 
 	@PostMapping
 	public User create(@Valid @RequestBody User user) {
-		User createdUser = storage.create(user);
+		User createdUser = service.create(user);
 		log.info("Создан пользователь с логином {}.", createdUser.getLogin());
 		return createdUser;
 	}
 
 	@PutMapping
 	public User update(@Valid @RequestBody User newUser) {
-		User oldUser = storage.update(newUser);
+		User oldUser = service.update(newUser);
 		log.info("Обновлён пользователь с идентификатором {}.", oldUser.getId());
 		return oldUser;
 	}
@@ -73,7 +76,7 @@ public class UserController {
 
 	@GetMapping("/{id}/friends")
 	public List<User> showFriends(@PathVariable Long id) {
-		return storage.showFriends(id);
+		return service.showFriends(id);
 	}
 
 	@GetMapping("/{id}/friends/common/{otherId}")

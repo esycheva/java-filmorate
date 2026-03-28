@@ -55,7 +55,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
         return films.values()
                 .stream()
-                .sorted(Comparator.comparing(Film::likeCount))
+                .sorted(Comparator.comparingInt(Film::likeCount).reversed())
                 .limit(count)
                 .toList();
     }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,5 +32,17 @@ public class FilmService {
 
     public List<Film> showPopular(Integer count) {
         return filmStorage.findPopularFilms(count);
+    }
+
+    public Collection<Film> findAllFilms(){
+        return filmStorage.findAllFilms();
+    }
+
+    public Film create(Film film) {
+        return filmStorage.create(film);
+    }
+
+    public Film update(Film newFilm){
+        return filmStorage.update(newFilm);
     }
 }
