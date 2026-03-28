@@ -22,7 +22,7 @@ public class UserService {
         return storage.findById(userId);
     }
 
-    public Collection<User> findAllUsers(){
+    public Collection<User> findAllUsers() {
         return storage.findAllUsers();
     }
 
@@ -46,7 +46,7 @@ public class UserService {
         return storage.create(user);
     }
 
-    public User update(User newUser){
+    public User update(User newUser) {
         return storage.update(newUser);
     }
 }

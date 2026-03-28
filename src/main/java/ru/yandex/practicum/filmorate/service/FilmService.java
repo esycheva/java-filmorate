@@ -34,7 +34,7 @@ public class FilmService {
         return filmStorage.findPopularFilms(count);
     }
 
-    public Collection<Film> findAllFilms(){
+    public Collection<Film> findAllFilms() {
         return filmStorage.findAllFilms();
     }
 
@@ -42,7 +42,7 @@ public class FilmService {
         return filmStorage.create(film);
     }
 
-    public Film update(Film newFilm){
+    public Film update(Film newFilm) {
         return filmStorage.update(newFilm);
     }
 }
