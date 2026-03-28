@@ -24,4 +24,6 @@ public interface UserStorage {
     public List<User> showCommonFriends(Long id, Long otherUserId);
 
     public Optional<User> findById(Long userId);
+
+    public Optional<User> find(Long id);
 }

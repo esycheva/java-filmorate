@@ -25,12 +25,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Optional<Film> addLike(Long filmId, Long userId) {
         Optional<Film> optFilm = find(filmId);
 
-        if (optFilm.isPresent()) {
-            Film film = optFilm.get();
-            Set<Long> likes = film.getLikes();
-            if (!likes.contains(userId)) {
-                likes.add(userId);
-            }
+        optFilm.orElseThrow(() -> new NotFoundException(String.format("Фильм с id=%s не найден", filmId)));
+
+        Film film = optFilm.get();
+        Set<Long> likes = film.getLikes();
+
+        if (!likes.contains(userId)) {
+            likes.add(userId);
         }
         return optFilm;
     }
@@ -38,12 +39,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Optional<Film> removeLike(Long filmId, Long userId) {
         Optional<Film> optFilm = find(filmId);
 
-        if (optFilm.isPresent()) {
-            Film film = optFilm.get();
-            Set<Long> likes = film.getLikes();
-            if (likes.contains(userId)) {
-                likes.remove(userId);
-            }
+        optFilm.orElseThrow(() -> new NotFoundException(String.format("Фильм с id=%s не найден", filmId)));
+
+        Film film = optFilm.get();
+        Set<Long> likes = film.getLikes();
+
+        if (likes.contains(userId)) {
+            likes.remove(userId);
         }
         return optFilm;
     }
@@ -115,7 +117,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return ++currentMaxId;
     }
 
-    private Optional<Film> find(Long id) {
+    public Optional<Film> find(Long id) {
        return films.values().stream()
                 .filter(film -> film.getId().equals(id))
                 .findFirst();

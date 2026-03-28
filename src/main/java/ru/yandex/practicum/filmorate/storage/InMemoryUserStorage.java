@@ -138,7 +138,7 @@ public class InMemoryUserStorage implements UserStorage {
         return ++currentMaxId;
     }
 
-    private Optional<User> find(Long id) {
+    public Optional<User> find(Long id) {
         return users.values().stream()
                 .filter(film -> film.getId().equals(id))
                 .findFirst();

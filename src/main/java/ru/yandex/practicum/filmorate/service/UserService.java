@@ -49,4 +49,8 @@ public class UserService {
     public User update(User newUser) {
         return storage.update(newUser);
     }
+
+    public Optional<User> find(Long id){
+        return storage.find(id);
+    }
 }
