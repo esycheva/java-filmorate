@@ -50,7 +50,7 @@ public class UserService {
         return storage.update(newUser);
     }
 
-    public Optional<User> find(Long id){
+    public Optional<User> find(Long id) {
         return storage.find(id);
     }
 }
