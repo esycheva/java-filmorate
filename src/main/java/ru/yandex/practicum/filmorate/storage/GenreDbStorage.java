@@ -10,11 +10,9 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.GenreRowMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component("genreDbStorage")
 @RequiredArgsConstructor
