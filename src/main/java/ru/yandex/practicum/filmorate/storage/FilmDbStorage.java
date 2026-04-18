@@ -77,7 +77,7 @@ public class FilmDbStorage implements FilmStorage {
                     .distinct()
                     .toList();
 
-            for(Genre genre: uniqueGenres) {
+            for (Genre genre: uniqueGenres) {
                 Optional<Genre> selectedGenre = findGenre(genre.getId());
                 selectedGenre.orElseThrow(() -> new NotFoundException(String.format("Жанр с id=%s не найден", genre.getId())));
 
@@ -159,7 +159,7 @@ public class FilmDbStorage implements FilmStorage {
         return count;
     }
 
-    public Optional<Film> removeLike(Long filmId, Long userId){
+    public Optional<Film> removeLike(Long filmId, Long userId) {
         Optional<Film> optFilm = find(filmId);
 
         Optional<User> user = findUser(userId);
@@ -173,7 +173,7 @@ public class FilmDbStorage implements FilmStorage {
         return optFilm;
     }
 
-    public List<Film> findPopularFilms(Integer count){
+    public List<Film> findPopularFilms(Integer count) {
         if (count == null) {
             count = 10;
         }
