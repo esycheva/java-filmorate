@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @JdbcTest
 @AutoConfigureTestDatabase
