@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.mappers;
 
 import org.springframework.jdbc.core.RowMapper;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
