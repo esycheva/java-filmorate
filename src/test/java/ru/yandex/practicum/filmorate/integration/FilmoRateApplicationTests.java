@@ -9,8 +9,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.RecordNotValidException;
 import ru.yandex.practicum.filmorate.mappers.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.GenreDbStorage;
@@ -169,7 +167,7 @@ public class FilmoRateApplicationTests {
     }
 
     @Test
-    public void testShowPopularFilms(){
+    public void testShowPopularFilms() {
         Film film = new Film();
         film.setName("Test Test");
         film.setDescription("I love you");
@@ -332,7 +330,7 @@ public class FilmoRateApplicationTests {
     }
 
     @Test
-    public void testFindAllFilms(){
+    public void testFindAllFilms() {
         Film film = new Film();
         film.setName("Test Test");
         film.setDescription("I love you");
@@ -383,7 +381,7 @@ public class FilmoRateApplicationTests {
     }
 
     @Test
-    public void testFilmUpdate(){
+    public void testFilmUpdate() {
         Film film = new Film();
         film.setName("Test Test");
         film.setDescription("I love you");
@@ -410,7 +408,7 @@ public class FilmoRateApplicationTests {
     }
 
     @Test
-    public void testAddLikeNotFoundException(){
+    public void testAddLikeNotFoundException() {
         NotFoundException exception = assertThrows(NotFoundException.class, () -> {
             filmStorage.addLike(9999L, 9999L);
         });
@@ -419,7 +417,7 @@ public class FilmoRateApplicationTests {
     }
 
     @Test
-    public void testRemoveLike(){
+    public void testRemoveLike() {
         Film film = new Film();
         film.setName("Test Test");
         film.setDescription("I love you");
