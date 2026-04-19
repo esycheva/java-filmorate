@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,17 +22,13 @@ import ru.yandex.practicum.filmorate.service.UserService;
 
 @RestController
 @RequestMapping("/films")
+@RequiredArgsConstructor
 public class FilmController {
 
 	private final FilmService service;
 	private final UserService userService;
 
 	private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-
-	public FilmController(FilmService service, UserService userService) {
-		this.service = service;
-		this.userService = userService;
-	}
 
 	@GetMapping
 	public Collection<Film> findAllFilms() {

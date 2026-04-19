@@ -3,6 +3,9 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
@@ -10,6 +13,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.RecordNotValidException;
 import ru.yandex.practicum.filmorate.mappers.FriendRowMapper;
 import ru.yandex.practicum.filmorate.mappers.UserRowMapper;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Friend;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -22,7 +26,8 @@ import java.util.stream.Collectors;
 @Component("userDbStorage")
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
-    private final JdbcTemplate jdbc;
+    //private final JdbcTemplate jdbc;
+    private final NamedParameterJdbcTemplate jdbc;
     private final UserRowMapper mapper;
     private final FriendRowMapper friendMapper;
 
@@ -40,18 +45,17 @@ public class UserDbStorage implements UserStorage {
             throw new RecordNotValidException(str);
         }
 
-        String sql = "INSERT INTO users (email, login, birthday, name) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO users (email, login, birthday, name) VALUES (:email, :login, :birthday, :name)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbc.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
-            ps.setString(1, user.getEmail());
-            ps.setString(2, user.getLogin());
-            ps.setDate(3, Date.valueOf(user.getBirthday()));
-            ps.setString(4, user.getName());
-            return ps;
-        }, keyHolder);
+        SqlParameterSource params = new MapSqlParameterSource()
+                .addValue("email", user.getEmail())
+                .addValue("login", user.getLogin())
+                .addValue("birthday", Date.valueOf(user.getBirthday()))
+                .addValue("name", user.getName());
+
+        jdbc.update(sql, params, keyHolder, new String[]{"id"});
 
         user.setId(keyHolder.getKey().longValue());
         return user;
@@ -66,14 +70,19 @@ public class UserDbStorage implements UserStorage {
 
         user.orElseThrow(() -> new NotFoundException(String.format("Пользователь с id=%s не найден", newUser.getId())));
 
-        String sql = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
+        String sql = "UPDATE users SET email = :email, login = :login, name = :name, birthday = :birthday WHERE id = :id";
 
-        jdbc.update(sql,
-                newUser.getEmail(),
-                newUser.getLogin(),
-                newUser.getName(),
-                Date.valueOf(newUser.getBirthday()),
-                newUser.getId());
+        SqlParameterSource params = new MapSqlParameterSource()
+                .addValue("email", newUser.getEmail())
+                .addValue("login", newUser.getLogin())
+                .addValue("birthday", Date.valueOf(newUser.getBirthday()))
+                .addValue("name", newUser.getName())
+                .addValue("id", newUser.getId());
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbc.update(sql, params, keyHolder, new String[]{"id"});
+
         return newUser;
     }
 
@@ -91,17 +100,16 @@ public class UserDbStorage implements UserStorage {
           throw new RecordNotValidException(String.format("У пользователя с id=%s уже добавлен друг с id=%s", id, friendUserId));
         }
 
-        String sql = "INSERT INTO friends (user_id, friend_id, approved) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO friends (user_id, friend_id, approved) VALUES (:userId, :test, :approved)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbc.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
-            ps.setLong(1, user.get().getId());
-            ps.setLong(2, friend.get().getId());
-            ps.setBoolean(3, false);
-            return ps;
-        }, keyHolder);
+        SqlParameterSource params = new MapSqlParameterSource()
+                .addValue("userId", user.get().getId())
+                .addValue("test", friend.get().getId())
+                .addValue("approved", false);
+
+        jdbc.update(sql, params, keyHolder, new String[]{"id"});
 
         return user;
     }
@@ -110,13 +118,17 @@ public class UserDbStorage implements UserStorage {
         Optional<User> optUser = find(id);
         Optional<User> friendUser = find(friendUserId);
 
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("userId", id)
+                .addValue("friendUserId", friendUserId);
+
         optUser.orElseThrow(() -> new NotFoundException(String.format("Пользователь с id=%s не найден", id)));
 
         friendUser.orElseThrow(() -> new NotFoundException(String.format("Пользователь с id=%s не найден", friendUserId)));
         String query = "DELETE FROM friends " +
-                       "WHERE friends.user_id  = ?" +
-                       "AND friends.friend_id = ?";
-        jdbc.update(query, id, friendUserId);
+                       "WHERE friends.user_id  = :userId " +
+                       "AND friends.friend_id = :friendUserId ";
+        jdbc.update(query, namedParameters);
 
         return optUser;
     }
@@ -126,23 +138,29 @@ public class UserDbStorage implements UserStorage {
 
         user.orElseThrow(() -> new NotFoundException(String.format("Пользователь с id=%s не найден", id)));
 
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);
+
         String query = "SELECT fu.id, fu.name, fu.login, fu.birthday FROM users AS u " +
                        "INNER JOIN friends AS f ON u.id = f.user_id " +
                        "INNER JOIN users AS fu ON f.friend_id = fu.id " +
-                       "WHERE u.id = ?";
-        return jdbc.query(query, mapper, id);
+                       "WHERE u.id = :id";
+        return jdbc.query(query, namedParameters, mapper);
     }
 
     public List<User> showCommonFriends(Long id, Long otherUserId) {
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("id", id)
+                .addValue("otherUserId", otherUserId);
+
         String query = "SELECT u.id, u.email, u.login, u.name, u.birthday " +
                 "FROM friends AS fr " +
                 "INNER JOIN users AS u ON fr.friend_id = u.id " +
                 "WHERE fr.friend_id IN ( " +
                 "    SELECT f.friend_id AS id " +
                 "    FROM friends AS f" +
-                "     WHERE f.user_id = ?" +
-                ") AND fr.user_id = ?";
-        return jdbc.query(query, mapper, id, otherUserId);
+                "     WHERE f.user_id = :id" +
+                ") AND fr.user_id = :otherUserId";
+        return jdbc.query(query, namedParameters, mapper);
     }
 
     public Optional<User> findById(Long userId) {
@@ -150,9 +168,11 @@ public class UserDbStorage implements UserStorage {
     }
 
     public Optional<User> find(Long id) {
-        String sql = "SELECT id, email, login, name, birthday FROM users WHERE id = ?";
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("id", id);
+        String sql = "SELECT id, email, login, name, birthday FROM users WHERE id = :id";
         try {
-            User user = jdbc.queryForObject(sql, mapper, id);
+            User user = jdbc.queryForObject(sql, namedParameters, mapper);
             return Optional.of(user);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -160,9 +180,13 @@ public class UserDbStorage implements UserStorage {
     }
 
     private Optional<Friend> findFriend(Long userId, Long friendUserId) {
-        String sql = "SELECT id, user_id, friend_id, approved FROM friends WHERE user_id = ? AND friend_id = ?";
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("userId", userId)
+                .addValue("friendId", friendUserId);
+
+        String sql = "SELECT id, user_id, friend_id, approved FROM friends WHERE user_id = :userId AND friend_id = :friendId";
         try {
-            Friend friend = jdbc.queryForObject(sql, friendMapper, userId, friendUserId);
+            Friend friend = jdbc.queryForObject(sql, namedParameters, friendMapper);
             return Optional.of(friend);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();

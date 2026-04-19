@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,14 +19,11 @@ import ru.yandex.practicum.filmorate.service.UserService;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 	private final UserService service;
 
 	private static final Logger log = LoggerFactory.getLogger(UserController.class);
-
-	public UserController(UserService service) {
-		this.service = service;
-	}
 
 	@GetMapping
 	public Collection<User> findAllUsers() {

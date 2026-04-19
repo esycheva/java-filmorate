@@ -3,6 +3,9 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
@@ -17,7 +20,7 @@ import java.util.Optional;
 @Component("mpaDbStorage")
 @RequiredArgsConstructor
 public class MpaDbStorage implements MpaStorage {
-    private final JdbcTemplate jdbc;
+    private final NamedParameterJdbcTemplate jdbc;
     private final MpaRowMapper mapper;
 
     public List<Mpa> findAllMpa() {
@@ -34,9 +37,11 @@ public class MpaDbStorage implements MpaStorage {
     }
 
     public Optional<Mpa> find(Long id) {
-        String sql = "SELECT id, name FROM mpa WHERE id = ?";
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);
+
+        String sql = "SELECT id, name FROM mpa WHERE id = :id";
         try {
-            Mpa mpa = jdbc.queryForObject(sql, mapper, id);
+            Mpa mpa = jdbc.queryForObject(sql, namedParameters, mapper);
             return Optional.of(mpa);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -44,15 +49,14 @@ public class MpaDbStorage implements MpaStorage {
     }
 
     public Mpa create(Mpa mpa) {
-        String sql = "INSERT INTO mpa (name) VALUES (?)";
+        String sql = "INSERT INTO mpa (name) VALUES (:name)";
+
+        SqlParameterSource genreParams = new MapSqlParameterSource()
+                .addValue("name", mpa.getName());
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbc.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
-            ps.setString(1, mpa.getName());
-            return ps;
-        }, keyHolder);
+        jdbc.update(sql, genreParams, keyHolder, new String[]{"id"});
 
         mpa.setId(keyHolder.getKey().longValue());
         return mpa;

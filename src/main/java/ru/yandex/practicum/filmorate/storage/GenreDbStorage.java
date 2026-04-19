@@ -3,12 +3,16 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.GenreRowMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.PreparedStatement;
 import java.util.List;
@@ -17,7 +21,7 @@ import java.util.Optional;
 @Component("genreDbStorage")
 @RequiredArgsConstructor
 public class GenreDbStorage implements  GenreStorage {
-    private final JdbcTemplate jdbc;
+    private final NamedParameterJdbcTemplate jdbc;
     private final GenreRowMapper mapper;
 
     public List<Genre> findAllGenres() {
@@ -34,9 +38,11 @@ public class GenreDbStorage implements  GenreStorage {
     }
 
     public Optional<Genre> find(Long id) {
-        String sql = "SELECT id, name FROM genre WHERE id = ?";
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);
+
+        String sql = "SELECT id, name FROM genre WHERE id = :id";
         try {
-            Genre genre = jdbc.queryForObject(sql, mapper, id);
+            Genre genre = jdbc.queryForObject(sql, namedParameters, mapper);
             return Optional.of(genre);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -44,17 +50,16 @@ public class GenreDbStorage implements  GenreStorage {
     }
 
     public Genre create(Genre genre) {
-        String sql = "INSERT INTO genre (name) VALUES (?)";
+        String sql = "INSERT INTO genre (name) VALUES (:name)";
 
-        KeyHolder keyHolder = new GeneratedKeyHolder();
+        SqlParameterSource genreParams = new MapSqlParameterSource()
+                .addValue("name", genre.getName());
 
-        jdbc.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
-            ps.setString(1, genre.getName());
-            return ps;
-        }, keyHolder);
+        KeyHolder genreKeyHolder = new GeneratedKeyHolder();
 
-        genre.setId(keyHolder.getKey().longValue());
+        jdbc.update(sql, genreParams, genreKeyHolder, new String[]{"id"});
+
+        genre.setId(genreKeyHolder.getKey().longValue());
         return genre;
     }
 }

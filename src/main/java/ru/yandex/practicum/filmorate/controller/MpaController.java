@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,14 +15,11 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/mpa")
+@RequiredArgsConstructor
 public class MpaController {
     private final MpaService service;
 
     private static final Logger log = LoggerFactory.getLogger(MpaController.class);
-
-    public MpaController(MpaService service) {
-        this.service = service;
-    }
 
     @GetMapping
     public Collection<Mpa> findAllMpa() {

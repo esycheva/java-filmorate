@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.extractor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.mappers.FilmRowMapper;
 import ru.yandex.practicum.filmorate.mappers.GenreInFilmMapper;
 import ru.yandex.practicum.filmorate.mappers.MpaInFilmMapper;
@@ -11,10 +13,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Optional;
 
+@Component
 public class FilmExtractor implements ResultSetExtractor<Optional<Film>> {
-    private final FilmRowMapper filmMapper = new FilmRowMapper();
-    private final GenreInFilmMapper genreMapper = new GenreInFilmMapper();
-    private final MpaInFilmMapper mpaMapper = new MpaInFilmMapper();
+    @Autowired
+    private FilmRowMapper filmMapper;
+
+    @Autowired
+    private GenreInFilmMapper genreMapper;
+
+    @Autowired
+    private MpaInFilmMapper mpaMapper;
 
     @Override
     public Optional<Film> extractData(ResultSet rs) throws SQLException {

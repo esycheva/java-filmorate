@@ -2,6 +2,9 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
@@ -27,7 +30,8 @@ import java.util.stream.Collectors;
 @Component("filmDbStorage")
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
-    private final JdbcTemplate jdbc;
+    private final NamedParameterJdbcTemplate jdbc;
+    private final FilmExtractor filmExtractor;
     private final FilmRowMapper mapper;
     private final UserRowMapper userMapper;
     private final MpaRowMapper mpaMapper;
@@ -54,18 +58,18 @@ public class FilmDbStorage implements FilmStorage {
             selectedMpa.orElseThrow(() -> new NotFoundException(String.format("MPA с id=%s не найден", mpa.getId())));
         }
 
-        String sql = "INSERT INTO films (name, description, release_date, duration) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO films (name, description, release_date, duration) " +
+                "VALUES (:name, :description, :releaseDate, :duration)";
+
+        SqlParameterSource params = new MapSqlParameterSource()
+                .addValue("name", film.getName())
+                .addValue("description", film.getDescription())
+                .addValue("releaseDate", Date.valueOf(film.getReleaseDate()))
+                .addValue("duration", film.getDuration());
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbc.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
-            ps.setString(1, film.getName());
-            ps.setString(2, film.getDescription());
-            ps.setDate(3, Date.valueOf(film.getReleaseDate()));
-            ps.setInt(4, film.getDuration());
-            return ps;
-        }, keyHolder);
+        jdbc.update(sql, params, keyHolder, new String[]{"id"});
 
         Long filmId = keyHolder.getKey().longValue();
         film.setId(filmId);
@@ -81,28 +85,28 @@ public class FilmDbStorage implements FilmStorage {
                 Optional<Genre> selectedGenre = findGenre(genre.getId());
                 selectedGenre.orElseThrow(() -> new NotFoundException(String.format("Жанр с id=%s не найден", genre.getId())));
 
-                String genreSql = "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
-                KeyHolder genreHolder = new GeneratedKeyHolder();
+                String genreSql = "INSERT INTO film_genre (film_id, genre_id) VALUES (:filmId, :genreId)";
 
-                jdbc.update(connection -> {
-                    PreparedStatement ps = connection.prepareStatement(genreSql, new String[]{"id"});
-                    ps.setLong(1, filmId);
-                    ps.setLong(2, genre.getId());
-                    return ps;
-                }, genreHolder);
+                SqlParameterSource genreParams = new MapSqlParameterSource()
+                        .addValue("filmId", filmId)
+                        .addValue("genreId", genre.getId());
+
+                KeyHolder genreKeyHolder = new GeneratedKeyHolder();
+
+                jdbc.update(genreSql, genreParams, genreKeyHolder, new String[]{"id"});
             }
         }
 
         if (mpa != null) {
-            String mpaSql = "INSERT INTO film_mpa (film_id, mpa_id) VALUES (?, ?)";
-            KeyHolder mpaHolder = new GeneratedKeyHolder();
+            String mpaSql = "INSERT INTO film_mpa (film_id, mpa_id) VALUES (:filmId, :mpaId)";
 
-            jdbc.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement(mpaSql, new String[]{"id"});
-                ps.setLong(1, filmId);
-                ps.setLong(2, mpa.getId());
-                return ps;
-            }, mpaHolder);
+            SqlParameterSource genreParams = new MapSqlParameterSource()
+                    .addValue("filmId", filmId)
+                    .addValue("mpaId", mpa.getId());
+
+            KeyHolder mpaKeyHolder = new GeneratedKeyHolder();
+
+            jdbc.update(mpaSql, genreParams, mpaKeyHolder, new String[]{"id"});
         }
         return film;
     }
@@ -116,14 +120,19 @@ public class FilmDbStorage implements FilmStorage {
 
         film.orElseThrow(() -> new NotFoundException(String.format("Фильм с id=%s не найден", newFilm.getId())));
 
-        String sql = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ? WHERE id = ?";
+        String sql = "UPDATE films SET name = :name, description = :description, release_date = :releaseDate, duration = :duration WHERE id = :id";
 
-        jdbc.update(sql,
-                newFilm.getName(),
-                newFilm.getDescription(),
-                Date.valueOf(newFilm.getReleaseDate()),
-                newFilm.getDuration(),
-                newFilm.getId());
+        SqlParameterSource params = new MapSqlParameterSource()
+                .addValue("name", newFilm.getName())
+                .addValue("description", newFilm.getDescription())
+                .addValue("releaseDate", Date.valueOf(newFilm.getReleaseDate()))
+                .addValue("duration", newFilm.getDuration())
+                .addValue("id", newFilm.getId());
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbc.update(sql, params, keyHolder, new String[]{"id"});
+
         return newFilm;
     }
 
@@ -135,16 +144,15 @@ public class FilmDbStorage implements FilmStorage {
         optFilm.orElseThrow(() -> new NotFoundException(String.format("Фильм с id=%s не найден", filmId)));
         user.orElseThrow(() -> new NotFoundException(String.format("Пользователь с id=%s не найден", userId)));
 
-        String sql = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)";
+        String sql = "INSERT INTO film_likes (film_id, user_id) VALUES (:filmId, :userId)";
+
+        SqlParameterSource params = new MapSqlParameterSource()
+                .addValue("filmId", optFilm.get().getId())
+                .addValue("userId", userId);
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbc.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
-            ps.setLong(1, optFilm.get().getId());
-            ps.setLong(2, userId);
-            return ps;
-        }, keyHolder);
+        jdbc.update(sql, params, keyHolder, new String[]{"id"});
 
         return optFilm;
     }
@@ -154,8 +162,11 @@ public class FilmDbStorage implements FilmStorage {
 
         optFilm.orElseThrow(() -> new NotFoundException(String.format("Фильм с id=%s не найден", filmId)));
 
-        String query = "SELECT COUNT(film_likes.film_id) FROM film_likes WHERE film_likes.film_id = ?";
-        Integer count = jdbc.queryForObject(query, Integer.class, filmId);
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("filmId", filmId);
+
+        String query = "SELECT COUNT(film_likes.film_id) FROM film_likes WHERE film_likes.film_id = :filmId";
+        Integer count = jdbc.queryForObject(query, namedParameters, Integer.class);
         return count;
     }
 
@@ -164,12 +175,16 @@ public class FilmDbStorage implements FilmStorage {
 
         Optional<User> user = findUser(userId);
 
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("filmId", filmId)
+                .addValue("userId", userId);
+
         optFilm.orElseThrow(() -> new NotFoundException(String.format("Фильм с id=%s не найден", filmId)));
         user.orElseThrow(() -> new NotFoundException(String.format("Пользователь с id=%s не найден", userId)));
         String query = "DELETE FROM film_likes " +
-                "WHERE film_likes.film_id  = ?" +
-                "AND film_likes.user_id = ?";
-        jdbc.update(query, filmId, userId);
+                "WHERE film_likes.film_id  = :filmId " +
+                "AND film_likes.user_id = :userId ";
+        jdbc.update(query, namedParameters);
         return optFilm;
     }
 
@@ -178,6 +193,8 @@ public class FilmDbStorage implements FilmStorage {
             count = 10;
         }
 
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("count", count);
+
         String query = "SELECT * " +
                 "FROM films AS f " +
                 "WHERE f.id IN (" +
@@ -185,8 +202,8 @@ public class FilmDbStorage implements FilmStorage {
                 "   FROM FILM_LIKES AS fl " +
                 "   GROUP BY (fl.film_id) " +
                 "   ORDER BY COUNT(fl.film_id) DESC " +
-                ") LIMIT ?";
-        return jdbc.query(query, mapper, count);
+                ") LIMIT :count";
+        return jdbc.query(query, namedParameters, mapper);
     }
 
     public Optional<Film> findById(Long filmId) {
@@ -194,6 +211,8 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public Optional<Film> find(Long id) {
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);
+
         String sql = "SELECT f.*, " +
                 "g.id AS genre_id, g.name AS genre_name, " +
                 "m.id AS mpa_id, m.name AS mpa_name " +
@@ -202,10 +221,9 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT OUTER JOIN genre AS g ON g.id = fg.genre_id " +
                 "LEFT OUTER JOIN film_mpa AS fm ON f.id = fm.film_id " +
                 "LEFT OUTER JOIN mpa AS m ON m.id = fm.mpa_id " +
-                "WHERE f.id = ?";
+                "WHERE f.id = :id";
         try {
-//            Film film = jdbc.queryForObject(sql, mapper, id);
-            Optional<Film> film = jdbc.query(sql, new FilmExtractor(), id);
+            Optional<Film> film = jdbc.query(sql, namedParameters, filmExtractor);
             return film;
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -213,9 +231,11 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private Optional<User> findUser(Long id) {
-        String sql = "SELECT id, email, login, name, birthday FROM users WHERE id = ?";
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);
+
+        String sql = "SELECT id, email, login, name, birthday FROM users WHERE id = :id";
         try {
-            User user = jdbc.queryForObject(sql, userMapper, id);
+            User user = jdbc.queryForObject(sql, namedParameters, userMapper);
             return Optional.of(user);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -223,9 +243,11 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private Optional<Mpa> findMpa(Long id) {
-        String sql = "SELECT id, name FROM mpa WHERE id = ?";
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);
+
+        String sql = "SELECT id, name FROM mpa WHERE id = :id";
         try {
-            Mpa mpa = jdbc.queryForObject(sql, mpaMapper, id);
+            Mpa mpa = jdbc.queryForObject(sql, namedParameters, mpaMapper);
             return Optional.of(mpa);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -233,9 +255,12 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private Optional<Genre> findGenre(Long id) {
-        String sql = "SELECT id, name FROM genre WHERE id = ?";
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);
+
+
+        String sql = "SELECT id, name FROM genre WHERE id = :id";
         try {
-            Genre genre = jdbc.queryForObject(sql, genreMapper, id);
+            Genre genre = jdbc.queryForObject(sql, namedParameters, genreMapper);
             return Optional.of(genre);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
