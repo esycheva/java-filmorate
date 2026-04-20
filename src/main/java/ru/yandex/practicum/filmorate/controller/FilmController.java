@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -31,12 +32,12 @@ public class FilmController {
 	private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
 	@GetMapping
-	public Collection<Film> findAllFilms() {
+	public Collection<FilmDto> findAllFilms() {
 		return service.findAllFilms();
 	}
 
 	@GetMapping("/{filmId}")
-	public Optional<Film> findById(@PathVariable long filmId) {
+	public Optional<FilmDto> findById(@PathVariable long filmId) {
 		return service.findById(filmId);
 	}
 
@@ -87,7 +88,7 @@ public class FilmController {
 	}
 
 	@GetMapping("/popular")
-	public List<Film> findPopularFilms(@RequestParam Integer count) {
+	public List<FilmDto> findPopularFilms(@RequestParam Integer count) {
 		return service.showPopular(count);
 	}
 }

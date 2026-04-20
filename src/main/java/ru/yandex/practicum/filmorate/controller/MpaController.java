@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.dto.MpaDto;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.MpaService;
 
@@ -22,12 +23,12 @@ public class MpaController {
     private static final Logger log = LoggerFactory.getLogger(MpaController.class);
 
     @GetMapping
-    public Collection<Mpa> findAllMpa() {
+    public Collection<MpaDto> findAllMpa() {
         return service.findAllMpa();
     }
 
     @GetMapping("/{mpaId}")
-    public Optional<Mpa> findById(@PathVariable long mpaId) {
+    public Optional<MpaDto> findById(@PathVariable long mpaId) {
         return service.findById(mpaId);
     }
 }
