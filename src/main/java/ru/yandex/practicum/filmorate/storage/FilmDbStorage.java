@@ -21,7 +21,6 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
-import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
