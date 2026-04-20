@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.mappers;
 
 import org.mapstruct.Mapper;
-import ru.yandex.practicum.filmorate.dto.GenreDto;
 import ru.yandex.practicum.filmorate.dto.MpaDto;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.Collection;
