@@ -15,14 +15,18 @@ import java.util.Optional;
 
 @Component
 public class FilmExtractor implements ResultSetExtractor<Optional<Film>> {
-    @Autowired
     private FilmRowMapper filmMapper;
 
-    @Autowired
     private GenreInFilmMapper genreMapper;
 
-    @Autowired
     private MpaInFilmMapper mpaMapper;
+
+    @Autowired
+    public FilmExtractor(FilmRowMapper filmMapper, GenreInFilmMapper genreMapper, MpaInFilmMapper mpaMapper) {
+        this.filmMapper = filmMapper;
+        this.genreMapper = genreMapper;
+        this.mpaMapper = mpaMapper;
+    }
 
     @Override
     public Optional<Film> extractData(ResultSet rs) throws SQLException {

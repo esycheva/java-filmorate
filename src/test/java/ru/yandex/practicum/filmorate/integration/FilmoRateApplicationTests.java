@@ -1,12 +1,15 @@
 package ru.yandex.practicum.filmorate.integration;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.RecordNotValidException;
+import ru.yandex.practicum.filmorate.extractor.FilmExtractor;
 import ru.yandex.practicum.filmorate.mappers.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -22,14 +25,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@JdbcTest
+@SpringBootTest
 @AutoConfigureTestDatabase
-@Import({UserDbStorage.class, FilmDbStorage.class, FilmRowMapper.class,
-        UserRowMapper.class, FriendRowMapper.class,
-        MpaRowMapper.class, GenreRowMapper.class,
-        GenreRowMapper.class, GenreDbStorage.class,
-        MpaDbStorage.class
-        })
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class FilmoRateApplicationTests {
 
     @Autowired
