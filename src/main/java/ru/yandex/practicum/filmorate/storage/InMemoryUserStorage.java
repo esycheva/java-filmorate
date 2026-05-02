@@ -83,8 +83,8 @@ public class InMemoryUserStorage implements UserStorage {
                 .toList();
     }
 
-    public Collection<User> findAllUsers() {
-        return users.values();
+    public List<User> findAllUsers() {
+        return users.values().stream().toList();
     }
 
     public User create(User user) {

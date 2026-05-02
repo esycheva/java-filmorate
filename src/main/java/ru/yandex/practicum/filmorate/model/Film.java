@@ -14,6 +14,8 @@ public class Film {
 	private LocalDate releaseDate;
 	private Integer duration;
 	private Set<Long> likes;
+	private List<Genre> genres;
+	private Mpa mpa;
 
 	public Integer likeCount() {
 		return likes.size();

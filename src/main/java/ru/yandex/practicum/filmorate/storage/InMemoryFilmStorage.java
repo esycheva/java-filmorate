@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+@Component("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films;
 
@@ -62,9 +62,10 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .toList();
     }
 
-
-    public Collection<Film> findAllFilms() {
-        return films.values();
+    public List<Film> findAllFilms() {
+        return films.values()
+                .stream()
+                .toList();
     }
 
     public Film create(Film film) {

@@ -4,10 +4,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.model.User;
 
 import org.slf4j.Logger;
@@ -18,22 +20,19 @@ import ru.yandex.practicum.filmorate.service.UserService;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 	private final UserService service;
 
 	private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-	public UserController(UserService service) {
-		this.service = service;
-	}
-
 	@GetMapping
-	public Collection<User> findAllUsers() {
+	public Collection<UserDto> findAllUsers() {
 		return service.findAllUsers();
 	}
 
 	@GetMapping("/{userId}")
-	public Optional<User> findById(@PathVariable long userId) {
+	public Optional<UserDto> findById(@PathVariable long userId) {
 		return service.findById(userId);
 	}
 
@@ -72,12 +71,12 @@ public class UserController {
 	}
 
 	@GetMapping("/{id}/friends")
-	public List<User> showFriends(@PathVariable Long id) {
+	public List<UserDto> showFriends(@PathVariable Long id) {
 		return service.showFriends(id);
 	}
 
 	@GetMapping("/{id}/friends/common/{otherId}")
-	public List<User> findCommonFriends(@PathVariable Long id, @PathVariable  Long otherId) {
+	public List<UserDto> findCommonFriends(@PathVariable Long id, @PathVariable  Long otherId) {
 		return service.showCommonFriends(id, otherId);
 	}
 }

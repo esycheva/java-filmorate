@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -21,6 +23,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 
 @RestController
 @RequestMapping("/films")
+@RequiredArgsConstructor
 public class FilmController {
 
 	private final FilmService service;
@@ -28,18 +31,13 @@ public class FilmController {
 
 	private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
-	public FilmController(FilmService service, UserService userService) {
-		this.service = service;
-		this.userService = userService;
-	}
-
 	@GetMapping
-	public Collection<Film> findAllFilms() {
+	public Collection<FilmDto> findAllFilms() {
 		return service.findAllFilms();
 	}
 
 	@GetMapping("/{filmId}")
-	public Optional<Film> findById(@PathVariable long filmId) {
+	public Optional<FilmDto> findById(@PathVariable long filmId) {
 		return service.findById(filmId);
 	}
 
@@ -90,7 +88,7 @@ public class FilmController {
 	}
 
 	@GetMapping("/popular")
-	public List<Film> findPopularFilms(@RequestParam Integer count) {
+	public List<FilmDto> findPopularFilms(@RequestParam Integer count) {
 		return service.showPopular(count);
 	}
 }

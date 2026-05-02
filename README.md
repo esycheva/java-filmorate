@@ -21,16 +21,14 @@ SELECT * FROM film WHERE id = 1
 Получение 5 популярных фильмов
 
 ```SQL
-
 SELECT * 
-FROM fimls WHERE id IN (
-    SELECT l.film_id
-    FROM films AS f
-    INNER JOIN likes AS l ON f.id = l.film_id
-    GROUP BY l.film_id
-    ORDER BY COUNT(l.film_id) DESC
-    LIMIT 5
-);
+FROM films AS f
+WHERE f.id IN (
+	SELECT fl.film_id 
+	FROM FILM_LIKES AS fl
+	GROUP BY (fl.film_id)
+	ORDER BY COUNT(fl.film_id) DESC
+) LIMIT 5;
 ```
 
 #### Примеры запросов (пользователи)
@@ -46,22 +44,24 @@ SELECT * FROM users
 ```SQL
 SELECT * FROM users WHERE id = 2
 ```
-Получение друзей
+Получение друзей (для пользователя с идентификатором 1):
 ```SQL
 SELECT fu.name
 FROM users AS u
 INNER JOIN friends AS f ON u.id = f.user_id
-INNER JOIN users AS fu ON f.friend_id = u.id
+INNER JOIN users AS fu ON f.friend_id = fu.id
+WHERE u.id = 1;
 ```
-Получение общих друзей для пользователя с идентификатором 1
+Получение общих друзей для пользователя с идентификатором 1 и идентификатором 2
+
 ```SQL
-SELECT * 
-FROM users AS us
-WHERE us.id IN (
-    SELECT f.friend_id
+SELECT *
+FROM friends AS fr
+INNER JOIN users AS u ON fr.friend_id = u.id
+WHERE fr.friend_id IN (
+    SELECT f.friend_id AS id
     FROM friends AS f
-    INNER JOIN users AS u ON f.user_id = u.id
     WHERE f.user_id = 1
-) AND us.id <> 1;
+) AND fr.user_id = 2;
 ```
 
